@@ -1,0 +1,28 @@
+---
+title: "Baseplot-part1"
+author: "Chandrasekar Ganesan"
+date: "February 24, 2017"
+output: 
+  html_document: 
+    keep_md: yes
+---
+# Simple Base Graphics: Histogram
+```{r}
+library(datasets)
+hist(airquality$Ozone)  # Draw a new plots
+```
+
+# Simple Base Graphics: Scatterplot
+```{r}
+library(datasets)
+with(airquality, plot(Wind,Ozone))
+```
+
+# Simple Base Graphics: BoxPlot
+```{r}
+library(datasets)
+airquality <- transform(airquality, Month=factor(Month))
+boxplot(Ozone ~ Month, airquality, xlab="Month", ylab="Ozone (ppb")
+```
+You can use cc
+
