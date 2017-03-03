@@ -1,0 +1,48 @@
+---
+title: "Week 2 Notes"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+***
+## Lattice plotting system
+
+Lattice plotting system is implemented using the following packages:
+
+* *lattice*: contains code for producing Trellis graphics, which are independent of the *"base"* graphics system; includes function like **xplot, bwplot, levelplot**
+
+* *grid*: implements a different graphing system independent of the *"base"* system; the *lattice* package builds on top of *grid*
+
+  - We seldom call functions from the *grid* package directly
+  
+* The lattice plotting system does not have a "two-phase" aspect with separate plotting and annotations like in base plotting.
+
+* All plotting/annotations is donoe at once with a single function call.
+
+## Lattice Fuctions
+
+### xyplot
+
+```{r}
+library(lattice)
+library(datasets)
+## Simple scatterplot
+
+xyplot(Ozone ~ Wind, data = airquality)
+```
+
+>Convert Month toa factor variable
+
+```{r}
+library(lattice)
+library(datasets)
+## Simple scatterplot
+airquality <- transform(airquality, Month=factor(Month))
+xyplot(Ozone ~ Wind | Month, data = airquality, layout=c(5,1))
+
+```
+
