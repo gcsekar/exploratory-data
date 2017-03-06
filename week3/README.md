@@ -494,6 +494,61 @@ pal(10)
 ##  [8] "#FFC600" "#FFE200" "#FFFF00"
 ```
 
+## RColorBrewer Package
+
+* One package on CRAN that contains interesting/useful color palettes
+
+* There are 3 types of palettes
+
+ - Sequential   - They go in specific order
+ - Diverging    - Used to show ranges (e.g., negative to positive)
+ - Qualitative  - Used for classification
+ 
+* Palette information can be used in conjunction with the colorRamp() and colorRampPalette()
+
+> **Example**
+
+
+```r
+library(RColorBrewer)
+cols <- brewer.pal(3, "BuGn")
+cols
+```
+
+```
+## [1] "#E5F5F9" "#99D8C9" "#2CA25F"
+```
+
+```r
+pals <- colorRampPalette(cols)
+image(volcano, col=pals(20))
+```
+
+![](README_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
+
+> Another Example **The smoothScatter function**
+
+
+```r
+x <- rnorm(10000)
+y <- rnorm(10000)
+smoothScatter(x,y)
+```
+
+![](README_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
+
+### Some other plotting notes
+
+* The rgb function can be used to produce any color via red, greeb and blue proportions
+
+* Color transparency can be added via the alpha parameter to rgb
+
+* the **colorspace** package can be used for a different control over colors
+
+
+
+
+
 
 
 
