@@ -494,6 +494,7 @@ pal(10)
 ##  [8] "#FFC600" "#FFE200" "#FFFF00"
 ```
 
+<<<<<<< HEAD
 ## RColorBrewer Package
 
 * One package on CRAN that contains interesting/useful color palettes
@@ -549,6 +550,8 @@ smoothScatter(x,y)
 
 
 
+=======
+>>>>>>> bfa45873437bcd0c99d5bf9e1b172bc1d489f5d7
 
 
 
