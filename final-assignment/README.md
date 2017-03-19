@@ -1,15 +1,8 @@
----
-title: "Emission Analysis"
-author: "Chandrasekar Ganesan"
-date: "March 12, 2017"
-output: 
-  html_document: 
-    keep_md: yes
----
+# Emission Analysis
+Chandrasekar Ganesan  
+March 12, 2017  
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+
 
 #Introduction
 
@@ -26,7 +19,8 @@ The zip file contains two files:
 
 PM2.5 Emissions Data (summarySCC_PM25.rds): This file contains a data frame with all of the PM2.5 emissions data for 1999, 2002, 2005, and 2008. For each year, the table contains number of tons of PM2.5 emitted from a specific type of source for the entire year. Here are the first few rows.
 
-```{r}
+
+```r
 ##     fips      SCC Pollutant Emissions  type year
 ## 4  09001 10100401  PM25-PRI    15.714 POINT 1999
 ## 8  09001 10100404  PM25-PRI   234.178 POINT 1999
@@ -47,7 +41,8 @@ Source Classification Code Table (Source_Classification_Code.rds): This table pr
 
 You can read each of the two files using the readRDS() function in R. For example, reading in each file can be done with the following code:
 
-```{r eval=FALSE}
+
+```r
 ## This first line will likely take a few seconds. Be patient!
 NEI <- readRDS("summarySCC_PM25.rds")
 SCC <- readRDS("Source_Classification_Code.rds")
@@ -81,7 +76,8 @@ You must address the following questions and tasks in your exploratory analysis.
 
 # Getting Data
 
-```{r cache=TRUE}
+
+```r
 NEI <- readRDS("data/summarySCC_PM25.rds")
 SCC <- readRDS("data/Source_Classification_Code.rds")
 ```
@@ -91,13 +87,15 @@ SCC <- readRDS("data/Source_Classification_Code.rds")
 ### Question 1 - Have total emissions from PM2.5 decreased in the United States from 1999 to 2008?
 #### (Use baseplot) 
 
-```{r}
+
+```r
 agg.emissions <- aggregate(Emissions ~ year, NEI, sum)
 agg.emissions$Emissions <- agg.emissions$Emissions/1000000
 
 barplot(agg.emissions$Emissions, xlab="Year", ylab="PM2.5 Emissions (million tons)", main = "Total PM2.5 Emissions From US Sources by Year", names.arg = agg.emissions$year)
-
 ```
+
+![](README_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
 >As it is evident from the plot above, the total emissions have decreased in the US from 1999 to 2008.
 
@@ -106,15 +104,17 @@ barplot(agg.emissions$Emissions, xlab="Year", ylab="PM2.5 Emissions (million ton
 ### Question 2 - Have total emissions from PM2.5 decreased in the Baltimore City, Maryland ?
 ####(Use baseplot)
 
-```{r}
+
+```r
 baltimore.city <- NEI[NEI$fips == "24510",]
 agg..baltimore.emissions <- aggregate(Emissions ~ year, baltimore.city,sum)
 
 # Chart it
 
 barplot(agg..baltimore.emissions$Emissions, names.arg = agg..baltimore.emissions$year, xlab = "Year", ylab = "PM 2.5 Emissions", main = "Total PM2.5 Emission from Baltimore City" )
-
 ```
+
+![](README_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 >As it is evident from the plot above, the total emissions in Baltimore is showing decrease (in a little adhoc manner) from 1999 to 2008.
 
@@ -123,7 +123,8 @@ barplot(agg..baltimore.emissions$Emissions, names.arg = agg..baltimore.emissions
 ### Question 3 - Which type of sources has seen increase or decrease in Emissions in Baltimore City, Maryland ?
 ####(Use ggplot)
 
-```{r}
+
+```r
 library(ggplot2)
 g <- ggplot(baltimore.city, aes(as.factor(year), Emissions, fill=type))
 g <- g + geom_bar(stat="identity")
@@ -133,6 +134,8 @@ g <- g + ggtitle(expression("PM"[2.5]*" Emissions, Baltimore City 1999-2008 by T
 g
 ```
 
+![](README_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+
 > Looking at the chart the source types **NON-ROAD**, **NONPOINT**, **ON-ROAD** have all shown a healthy decrease in emissions.
 
 ***
@@ -140,7 +143,8 @@ g
 ### Question 4 - How the emissions from coal combustion related sources changed from 1999 - 2008 ?
 ####(Use ggplot)
 
-```{r}
+
+```r
 ## Get the list of codes from SCC
 combutions.type <- grepl("comb", SCC$SCC.Level.One, ignore.case = TRUE)
 coal.type <- grepl("coal", SCC$SCC.Level.Four, ignore.case = TRUE)
@@ -153,8 +157,9 @@ g <- g + geom_bar(aes(as.factor(year), fill=year), stat="identity", show.legend 
 g <- g + labs(x = "Year", y = expression("Total PM"[2.5]*" Emission (Million Tons)"))
 g <- g + ggtitle(expression("PM"[2.5]*" Emission (Million Tons) from Coal Combustion in US from 1999-2008"))
 g
-
 ```
+
+![](README_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
 > As it can be observed the emissions from coal Combustion related sources have reduced from 0.6 Million Tons to less than 0.4 Million Tons
 
@@ -163,7 +168,8 @@ g
 ### Question 5 - How the emissions from motor vehicle sources changed from 1999 - 2008 in Baltimore City?
 ####(Use ggplot)
 
-```{r}
+
+```r
 ## Get the list of codes from SCC
 vehicle.type <- grepl("vehicle", SCC$SCC.Level.Two, ignore.case = TRUE)
 vehicle.scc <- SCC[vehicle.type,]$SCC
@@ -174,15 +180,17 @@ g <- g + geom_bar(aes(as.factor(year), fill=year), stat="identity", show.legend 
 g <- g + labs(x = "Year", y = expression("Total PM"[2.5]*" Emission (Tons)"))
 g <- g + ggtitle(expression("PM"[2.5]*" Emission (Tons) from Coal Combustion in US from 1999-2008"))
 g
-
 ```
+
+![](README_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 
 > Emissions from motor vehicles have decreased from 1999 - 2008 in Baltimore City
 
 ### Question 6 - Compare emissions from motor vehicle source in Baltimore City to Las Angeles County,CA?
 ####(Use ggplot)
 
-```{r}
+
+```r
 # Get the list of codes from SCC
 vehicle.type <- grepl("vehicle", SCC$SCC.Level.Two, ignore.case = TRUE)
 vehicle.scc <- SCC[vehicle.type,]$SCC
@@ -198,8 +206,9 @@ g <- g + labs(x = "Year", y = expression("Total PM"[2.5]*" Emission (Tons)"))
 g <- g + ggtitle(expression("PM"[2.5]*" Emission (Tons) between Baltimore & LA County from 1999-2008"))
 g <- g + facet_grid(.~ city)
 g
-
 ```
+
+![](README_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 
 > Los Angeles County has seen a significant increase in emission overtime in motor vehical emissions when compared to Los Angeles County
 
