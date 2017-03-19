@@ -77,4 +77,126 @@ You must address the following questions and tasks in your exploratory analysis.
 
 ***
 
-# Getting Data 
+# Getting Data
+
+```{r cache=TRUE}
+NEI <- readRDS("data/summarySCC_PM25.rds")
+SCC <- readRDS("data/Source_Classification_Code.rds")
+```
+
+## Analysis
+
+### Question 1 - Have total emissions from PM2.5 decreased in the United States from 1999 to 2008?
+#### (Use baseplot) 
+
+```{r}
+agg.emissions <- aggregate(Emissions ~ year, NEI, sum)
+agg.emissions$Emissions <- agg.emissions$Emissions/1000000
+
+barplot(agg.emissions$Emissions, xlab="Year", ylab="PM2.5 Emissions (million tons)", main = "Total PM2.5 Emissions From US Sources by Year", names.arg = agg.emissions$year)
+
+```
+
+>As it is evident from the plot above, the total emissions have decreased in the US from 1999 to 2008.
+
+***
+
+### Question 2 - Have total emissions from PM2.5 decreased in the Baltimore City, Maryland ?
+####(Use baseplot)
+
+```{r}
+baltimore.city <- NEI[NEI$fips == "24510",]
+agg..baltimore.emissions <- aggregate(Emissions ~ year, baltimore.city,sum)
+
+# Chart it
+
+barplot(agg..baltimore.emissions$Emissions, names.arg = agg..baltimore.emissions$year, xlab = "Year", ylab = "PM 2.5 Emissions", main = "Total PM2.5 Emission from Baltimore City" )
+
+```
+
+>As it is evident from the plot above, the total emissions in Baltimore is showing decrease (in a little adhoc manner) from 1999 to 2008.
+
+***
+
+### Question 3 - Which type of sources has seen increase or decrease in Emissions in Baltimore City, Maryland ?
+####(Use ggplot)
+
+```{r}
+library(ggplot2)
+g <- ggplot(baltimore.city, aes(as.factor(year), Emissions, fill=type))
+g <- g + geom_bar(stat="identity")
+g <- g + facet_grid(. ~ type)
+g <- g + labs(x = "Year", y = expression("PM"[2.5]*" Emissions"))
+g <- g + ggtitle(expression("PM"[2.5]*" Emissions, Baltimore City 1999-2008 by Type"))
+g
+```
+
+> Looking at the chart the source types **NON-ROAD**, **NONPOINT**, **ON-ROAD** have all shown a healthy decrease in emissions.
+
+***
+
+### Question 4 - How the emissions from coal combustion related sources changed from 1999 - 2008 ?
+####(Use ggplot)
+
+```{r}
+## Get the list of codes from SCC
+combutions.type <- grepl("comb", SCC$SCC.Level.One, ignore.case = TRUE)
+coal.type <- grepl("coal", SCC$SCC.Level.Four, ignore.case = TRUE)
+
+coal.combustion.scc <- SCC[coal.type & combutions.type,]$SCC
+coal.combustion <- NEI[NEI$SCC %in% coal.combustion.scc,]
+
+g <- ggplot(coal.combustion, aes(factor(year), Emissions/10^6))
+g <- g + geom_bar(aes(as.factor(year), fill=year), stat="identity", show.legend = FALSE) 
+g <- g + labs(x = "Year", y = expression("Total PM"[2.5]*" Emission (Million Tons)"))
+g <- g + ggtitle(expression("PM"[2.5]*" Emission (Million Tons) from Coal Combustion in US from 1999-2008"))
+g
+
+```
+
+> As it can be observed the emissions from coal Combustion related sources have reduced from 0.6 Million Tons to less than 0.4 Million Tons
+
+***
+
+### Question 5 - How the emissions from motor vehicle sources changed from 1999 - 2008 in Baltimore City?
+####(Use ggplot)
+
+```{r}
+## Get the list of codes from SCC
+vehicle.type <- grepl("vehicle", SCC$SCC.Level.Two, ignore.case = TRUE)
+vehicle.scc <- SCC[vehicle.type,]$SCC
+baltimore.vehicles <- NEI[NEI$SCC %in% vehicle.scc & NEI$fips == 24510, ]
+
+g <- ggplot(baltimore.vehicles, aes(factor(year), Emissions))
+g <- g + geom_bar(aes(as.factor(year), fill=year), stat="identity", show.legend = FALSE) 
+g <- g + labs(x = "Year", y = expression("Total PM"[2.5]*" Emission (Tons)"))
+g <- g + ggtitle(expression("PM"[2.5]*" Emission (Tons) from Coal Combustion in US from 1999-2008"))
+g
+
+```
+
+> Emissions from motor vehicles have decreased from 1999 - 2008 in Baltimore City
+
+### Question 6 - Compare emissions from motor vehicle source in Baltimore City to Las Angeles County,CA?
+####(Use ggplot)
+
+```{r}
+# Get the list of codes from SCC
+vehicle.type <- grepl("vehicle", SCC$SCC.Level.Two, ignore.case = TRUE)
+vehicle.scc <- SCC[vehicle.type,]$SCC
+vehicles <- NEI[NEI$SCC %in% vehicle.scc & NEI$fips %in% c("24510","06037"), ]
+vehicles$city <- NA
+vehicles[vehicles$fips == "06037",]$city <- "Los Angeles County"
+vehicles[vehicles$fips == "24510",]$city <- "Baltimore City"
+
+
+g <- ggplot(vehicles, aes(factor(year), Emissions, fill=city))
+g <- g + geom_bar(aes(as.factor(year), fill=city), stat="identity", show.legend = FALSE) 
+g <- g + labs(x = "Year", y = expression("Total PM"[2.5]*" Emission (Tons)"))
+g <- g + ggtitle(expression("PM"[2.5]*" Emission (Tons) between Baltimore & LA County from 1999-2008"))
+g <- g + facet_grid(.~ city)
+g
+
+```
+> Los Angeles County has seen a significant increase in emission overtime in motor vehical emissions when compared to Los Angeles County
+
