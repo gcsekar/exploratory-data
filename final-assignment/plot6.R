@@ -1,3 +1,5 @@
+source("final-assignment/downloadfile.R")
+
 NEI <- readRDS("final-assignment/data/summarySCC_PM25.rds")
 SCC <- readRDS("final-assignment/data/Source_Classification_Code.rds")
 
